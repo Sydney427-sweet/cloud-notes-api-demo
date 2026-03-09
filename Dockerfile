@@ -1,31 +1,20 @@
-<<<<<<< HEAD
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-CMD gunicorn --bind 0.0.0.0:$PORT app:app
-=======
-# Base image
+# Use official Python image
 FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Copy requirements first for caching
 COPY requirements.txt .
+
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
+# Copy all project files
 COPY . .
 
-# Expose port
+# Expose port (Render expects 10000+ or default 5000)
 EXPOSE 5000
 
-# Run Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "app:app"]
->>>>>>> 5eb45e9 (Initial commit - CLoud Notes API complete)
+# Run the app with gunicorn
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000"]
