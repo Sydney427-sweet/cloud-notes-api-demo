@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cloud Notes</title>
+</head>
+<body>
+    <h1>My Cloud Notes</h1>
+
+    <input type="text" id="noteContent" placeholder="Write a new note">
+    <button onclick="addNote()">Add</button>
+
+    <h2>Saved Notes:</h2>
+    <ul id="notesList"></ul>
+
+    <script>
+        async function loadNotes() {
+            try {
+                const response = await fetch('/notes');
+                const notes = await response.json();
+
+                const list = document.getElementById('notesList');
+                list.innerHTML = '';
+
+                notes.forEach(note => {
+                    const li = document.createElement('li');
+                    li.textContent = note.content;
+                    list.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Error loading notes:", error);
+            }
+        }
+
+        async function addNote() {
+            const input = document.getElementById('noteContent');
+            const content = input.value.trim();
+
+            if (!content) return;
+
+            try {
+                await fetch('/notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: content })
+                });
+
+                input.value = '';
+                loadNotes(); // Refresh list immediately
+
+            } catch (error) {
+                console.error("Error adding note:", error);
+            }
+        }
+
+        window.onload = loadNotes;
+    </script>
+</body>
+</html>
